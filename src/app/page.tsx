@@ -4,6 +4,7 @@ import {
   Braces,
   Database,
   Eye,
+  FileText,
   GitBranch,
   LockKeyhole,
   MessageSquareText,
@@ -53,10 +54,30 @@ export default function Home() {
               Decide faster.
             </h1>
             <p>
-              A working, synthetic demonstration of an AI company brain that
-              turns scattered customer, product and operating signals into
-              decisions you can defend.
+              An AI company brain automatically gathers context from the places
+              work already happens, then turns scattered customer, product and
+              operating signals into evidence-linked decisions you can defend.
+              This public sandbox uses synthetic records to demonstrate that
+              workflow.
             </p>
+            <div
+              className="hero-source-row"
+              aria-label="Example company-brain inputs"
+            >
+              <span className="hero-source-label">Automatic inputs</span>
+              <span>
+                <MessageSquareText size={13} aria-hidden="true" />
+                Slack conversations
+              </span>
+              <span>
+                <GitBranch size={13} aria-hidden="true" />
+                Linear / Jira tickets
+              </span>
+              <span>
+                <FileText size={13} aria-hidden="true" />
+                Google Meet transcripts
+              </span>
+            </div>
             <div className="hero-actions">
               <a className="button button-primary" href="#demo">
                 Try the workspace

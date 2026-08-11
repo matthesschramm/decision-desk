@@ -241,10 +241,45 @@ input:focus-visible {
   letter-spacing: -0.018em;
 }
 
+.hero-source-row {
+  display: flex;
+  gap: 7px;
+  flex-wrap: wrap;
+  align-items: center;
+  margin-top: 23px;
+}
+
+.hero-source-row > span:not(.hero-source-label) {
+  display: inline-flex;
+  gap: 6px;
+  align-items: center;
+  padding: 7px 9px;
+  border: 1px solid var(--line-strong);
+  border-radius: 7px;
+  color: var(--ink-soft);
+  background: rgba(255, 255, 255, 0.42);
+  font-size: 0.64rem;
+  font-weight: 560;
+}
+
+.hero-source-row svg {
+  color: var(--coral);
+}
+
+.hero-source-label {
+  margin-right: 3px;
+  color: var(--muted);
+  font-family: var(--mono);
+  font-size: 0.54rem;
+  font-weight: 650;
+  letter-spacing: 0.07em;
+  text-transform: uppercase;
+}
+
 .hero-actions {
   display: flex;
   gap: 12px;
-  margin-top: 34px;
+  margin-top: 28px;
 }
 
 .button {
@@ -1911,6 +1946,11 @@ footer a {
   .hero-actions {
     align-items: stretch;
     flex-direction: column;
+  }
+
+  .hero-source-label {
+    flex-basis: 100%;
+    margin-bottom: 2px;
   }
 
   .hero-assurances {
