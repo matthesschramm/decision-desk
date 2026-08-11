@@ -28,7 +28,7 @@ test("shows a traceable answer and creates a decision brief", async ({
   await expect(page.locator(".answer-title-row h3")).not.toHaveText("");
   await expect(page.locator(".finding").first()).toBeVisible();
   await expect(page.locator(".mode-badge")).toContainText(
-    /Live synthesis|Guided demo/,
+    /Live synthesis|Live inference ready|Guided fallback|Guided demo/,
   );
 
   await page.locator(".source-reference").first().click();

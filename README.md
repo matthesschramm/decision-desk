@@ -50,7 +50,7 @@ Three guided questions demonstrate the intended journey:
 - TypeScript synthetic corpus
 - Local weighted retrieval with query expansion
 - Validated POST route with Zod input and output schemas
-- OpenAI Responses API for optional live synthesis
+- Schema-constrained OpenAI Responses API live synthesis in production
 - Deterministic guided synthesis when no API key is configured or the model is unavailable
 - Server-side credentials, input limits, basic request throttling and no response caching
 

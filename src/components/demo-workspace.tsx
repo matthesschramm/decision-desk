@@ -29,6 +29,7 @@ import type {
 type DemoWorkspaceProps = {
   initialAnswer: AnswerPayload;
   promptOptions: string[];
+  liveInferenceEnabled: boolean;
 };
 
 const loadingStages = [
@@ -125,6 +126,7 @@ function EvidenceCard({
 export function DemoWorkspace({
   initialAnswer,
   promptOptions,
+  liveInferenceEnabled,
 }: DemoWorkspaceProps) {
   const [query, setQuery] = useState(initialAnswer.query);
   const [answer, setAnswer] = useState(initialAnswer);
@@ -132,6 +134,7 @@ export function DemoWorkspace({
     initialAnswer.evidence[0]?.id ?? "",
   );
   const [view, setView] = useState<"answer" | "brief">("answer");
+  const [hasQueried, setHasQueried] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const [loadingStage, setLoadingStage] = useState(0);
   const [error, setError] = useState("");
@@ -184,6 +187,7 @@ export function DemoWorkspace({
 
       const nextAnswer = payload as AnswerPayload;
       setAnswer(nextAnswer);
+      setHasQueried(true);
       setActiveEvidenceId(nextAnswer.evidence[0]?.id ?? "");
       setView("answer");
     } catch (caught) {
@@ -309,15 +313,30 @@ export function DemoWorkspace({
                 </button>
               </div>
               <span
-                className={`mode-badge ${answer.mode}`}
+                className={`mode-badge ${
+                  answer.mode === "live" ||
+                  (liveInferenceEnabled && !hasQueried)
+                    ? "live"
+                    : "guided"
+                }`}
                 title={
                   answer.mode === "live"
                     ? "Generated live from the retrieved evidence"
-                    : "Curated fallback used when no model key is configured"
+                    : liveInferenceEnabled && !hasQueried
+                      ? "Ask any question to generate a live answer"
+                      : liveInferenceEnabled
+                        ? "The live model was unavailable, so the guided fallback was used"
+                        : "Curated fallback used when no model key is configured"
                 }
               >
                 <Sparkles size={12} aria-hidden="true" />
-                {answer.mode === "live" ? "Live synthesis" : "Guided demo"}
+                {answer.mode === "live"
+                  ? "Live synthesis"
+                  : liveInferenceEnabled && !hasQueried
+                    ? "Live inference ready"
+                    : liveInferenceEnabled
+                      ? "Guided fallback"
+                      : "Guided demo"}
               </span>
             </div>
 

@@ -152,6 +152,7 @@ export default function Home() {
         <DemoWorkspace
           initialAnswer={initialAnswer}
           promptOptions={PROMPT_OPTIONS}
+          liveInferenceEnabled={Boolean(process.env.OPENAI_API_KEY)}
         />
 
         <section className="how-section" id="build">
