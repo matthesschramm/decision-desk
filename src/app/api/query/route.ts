@@ -1,4 +1,5 @@
 import OpenAI from "openai";
+import { zodTextFormat } from "openai/helpers/zod";
 import { z } from "zod";
 
 import { guidedAnswer } from "@/lib/guided-answers";
@@ -12,24 +13,21 @@ const querySchema = z.object({
 });
 
 const modelAnswerSchema = z.object({
-  headline: z.string().min(8).max(120),
-  summary: z.string().min(40).max(900),
-  findings: z
-    .array(
-      z.object({
-        title: z.string().min(4).max(100),
-        detail: z.string().min(30).max(700),
-        sourceIds: z.array(z.string()).min(1).max(4),
-      }),
-    )
-    .min(2)
-    .max(4),
-  recommendation: z.string().min(30).max(900),
+  headline: z.string(),
+  summary: z.string(),
+  findings: z.array(
+    z.object({
+      title: z.string(),
+      detail: z.string(),
+      sourceIds: z.array(z.string()),
+    }),
+  ),
+  recommendation: z.string(),
   experiment: z.object({
-    change: z.string().min(20).max(500),
-    primaryMetric: z.string().min(10).max(300),
-    guardrail: z.string().min(10).max(300),
-    readWhen: z.string().min(10).max(220),
+    change: z.string(),
+    primaryMetric: z.string(),
+    guardrail: z.string(),
+    readWhen: z.string(),
   }),
   confidence: z.enum(["High", "Medium", "Low"]),
 });
@@ -60,15 +58,6 @@ function withinRateLimit(key: string) {
   return true;
 }
 
-function parseJsonResponse(raw: string) {
-  const withoutFence = raw
-    .trim()
-    .replace(/^```(?:json)?\s*/i, "")
-    .replace(/\s*```$/, "");
-
-  return modelAnswerSchema.parse(JSON.parse(withoutFence));
-}
-
 async function liveAnswer(query: string): Promise<AnswerPayload | null> {
   const apiKey = process.env.OPENAI_API_KEY;
   if (!apiKey) return null;
@@ -81,9 +70,13 @@ async function liveAnswer(query: string): Promise<AnswerPayload | null> {
     maxRetries: 1,
   });
 
-  const response = await client.responses.create({
+  const response = await client.responses.parse({
     model: process.env.OPENAI_MODEL || "gpt-5.5",
-    max_output_tokens: 1_400,
+    max_output_tokens: 1_800,
+    store: false,
+    text: {
+      format: zodTextFormat(modelAnswerSchema, "decision_desk_answer"),
+    },
     instructions: [
       "You are the evidence synthesis layer for Decision Desk, a public product sandbox.",
       "The workspace and all records are fictional and synthetic.",
@@ -92,7 +85,7 @@ async function liveAnswer(query: string): Promise<AnswerPayload | null> {
       "Separate observed evidence from recommendations. Surface conflicts or uncertainty.",
       "Prefer one small test with a primary metric, guardrail, and explicit read threshold.",
       "Cite evidence using only the supplied source IDs.",
-      "Return only valid JSON with these keys: headline, summary, findings, recommendation, experiment, confidence.",
+      "Keep the headline under 90 characters, the summary to two sentences, and provide three concise findings.",
       "Each finding must contain title, detail, and sourceIds. Experiment must contain change, primaryMetric, guardrail, and readWhen.",
     ].join("\n"),
     input: JSON.stringify({
@@ -112,11 +105,31 @@ async function liveAnswer(query: string): Promise<AnswerPayload | null> {
     }),
   });
 
-  const parsed = parseJsonResponse(response.output_text);
-  const findings = parsed.findings.map((finding) => ({
-    ...finding,
-    sourceIds: finding.sourceIds.filter((id) => allowedIds.has(id)),
-  }));
+  const parsed = response.output_parsed;
+  if (!parsed) throw new Error("The model returned no structured answer.");
+
+  const findings = parsed.findings
+    .slice(0, 4)
+    .map((finding, index) => {
+      const sourceIds = finding.sourceIds
+        .filter((id) => allowedIds.has(id))
+        .slice(0, 4);
+
+      return {
+        ...finding,
+        sourceIds:
+          sourceIds.length > 0
+            ? sourceIds
+            : relevant[index]
+              ? [relevant[index].id]
+              : [],
+      };
+    })
+    .filter((finding) => finding.sourceIds.length > 0);
+
+  if (findings.length === 0) {
+    throw new Error("The model returned no traceable findings.");
+  }
   const citedIds = [
     ...new Set(findings.flatMap((finding) => finding.sourceIds)),
   ];
