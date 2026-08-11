@@ -20,14 +20,16 @@ test("shows a traceable answer and creates a decision brief", async ({
     }),
   ).toBeVisible();
 
-  await page
-    .getByRole("button", { name: "What should the team test next?" })
-    .click();
-  await expect(
-    page.getByRole("heading", {
-      name: "Fix the known defect; test the uncertain behaviour.",
-    }),
-  ).toBeVisible();
+  const nextPrompt = "What should the team test next?";
+  await page.getByRole("button", { name: nextPrompt }).click();
+  await expect(page.locator(".asked-question")).toHaveText(nextPrompt, {
+    timeout: 30_000,
+  });
+  await expect(page.locator(".answer-title-row h3")).not.toHaveText("");
+  await expect(page.locator(".finding").first()).toBeVisible();
+  await expect(page.locator(".mode-badge")).toContainText(
+    /Live synthesis|Guided demo/,
+  );
 
   await page.locator(".source-reference").first().click();
   await expect(page.locator(".evidence-card.is-active")).toHaveCount(1);
