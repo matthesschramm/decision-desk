@@ -354,15 +354,12 @@ export default function Home() {
               COO/CFO of a growth-stage technology company. I use AI coding
               agents and GitHub as part of my normal workflow to turn ambiguous
               operating problems into products and live systems—from
-              customer-support automation to a cloud-hosted company brain and
-              an agentic video-creation prototype.
+              customer-support automation to a cloud-hosted company brain.
             </p>
             <p>
-              Before this, I founded a startup, led finance at Afterpay through
-              its integration with Block and began my career at EY. The common
-              thread is end-to-end ownership: understand the real problem,
-              build the smallest useful thing and let evidence decide what
-              happens next.
+              The common thread is end-to-end ownership: understand the real
+              problem, build the smallest useful thing and let evidence decide
+              what happens next.
             </p>
           </div>
           <a className="button button-primary" href="#demo">
