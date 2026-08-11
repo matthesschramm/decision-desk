@@ -4,6 +4,8 @@ Decision Desk is a public, synthetic demonstration of an evidence-backed company
 
 It begins with an operating question, retrieves relevant records from a fictional consumer-finance workspace, separates evidence from inference, cites every claim and converts the result into a measurable decision brief.
 
+Live demo: https://decision-desk-blue.vercel.app
+
 Tagline: Ask the company. See the evidence. Decide faster.
 
 ## Why this exists
