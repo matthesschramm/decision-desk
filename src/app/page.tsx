@@ -312,7 +312,7 @@ export default function Home() {
               <p>
                 The sandbox has a simple external usability read. Results will
                 be published after the first five observed sessions rather
-                than invented for the application.
+                than invented upfront.
               </p>
             </div>
             <dl>
